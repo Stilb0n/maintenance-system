@@ -1,0 +1,11 @@
+### Получить все заявки
+GET http://localhost:8081/api/requests
+
+### Создать новую заявку
+POST http://localhost:8081/api/requests
+Content-Type: application/json
+
+{
+  "equipmentName": "Кондиционер №3",
+  "description": "Не включается"
+}

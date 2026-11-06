@@ -1,15 +1,14 @@
 package org.example
 
+import org.example.model.CreateRequestDto
 import org.example.model.MaintenanceRequest
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/requests")
 class RequestController {
 
-    private val requests = listOf(
+    private val requests = mutableListOf(
         MaintenanceRequest(
             id = 1,
             equipmentName = "Кондиционер №1",
@@ -23,9 +22,21 @@ class RequestController {
             status = "В работе"
         )
     )
+    private var nextId = 3L
 
     @GetMapping
     fun getAllRequests(): List<MaintenanceRequest> {
         return requests
+    }
+    @PostMapping
+    fun createRequest(@RequestBody request: CreateRequestDto): MaintenanceRequest {
+        val newRequest = MaintenanceRequest(
+            id = nextId++,
+            equipmentName = request.equipmentName,
+            description = request.description,
+            status = "Новая"
+        )
+        requests.add(newRequest)
+        return newRequest
     }
 }
