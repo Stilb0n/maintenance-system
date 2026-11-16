@@ -9,3 +9,13 @@ Content-Type: application/json
   "equipmentName": "Кондиционер №3",
   "description": "Не включается"
 }
+### Изменить статус заявки №1
+PATCH http://localhost:8081/api/requests/1/status
+Content-Type: application/json
+
+{
+  "status": "В работе"
+}
+
+### Проверить обновлённую заявку
+GET http://localhost:8081/api/requests/1

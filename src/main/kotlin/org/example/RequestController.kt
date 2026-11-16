@@ -2,6 +2,8 @@ package org.example
 
 import org.example.model.CreateRequestDto
 import org.example.model.MaintenanceRequest
+import org.example.model.UpdateRequestStatusDto
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -28,6 +30,34 @@ class RequestController {
     fun getAllRequests(): List<MaintenanceRequest> {
         return requests
     }
+    @GetMapping("/{id}")
+    fun getRequestById(@PathVariable id: Long): ResponseEntity<MaintenanceRequest> {
+        val request = requests.find { it.id == id }
+
+        return if (request != null) {
+            ResponseEntity.ok(request)
+        } else {
+            ResponseEntity.notFound().build()
+        }
+    }
+    @PatchMapping("/{id}/status")
+    fun updateRequestStatus(
+        @PathVariable id: Long,
+        @RequestBody request: UpdateRequestStatusDto
+    ): ResponseEntity<MaintenanceRequest> {
+
+        val index = requests.indexOfFirst { it.id == id }
+
+        if (index == -1) {
+            return ResponseEntity.notFound().build()
+        }
+
+        val updatedRequest = requests[index].copy(status = request.status)
+        requests[index] = updatedRequest
+
+        return ResponseEntity.ok(updatedRequest)
+    }
+
     @PostMapping
     fun createRequest(@RequestBody request: CreateRequestDto): MaintenanceRequest {
         val newRequest = MaintenanceRequest(
@@ -38,5 +68,4 @@ class RequestController {
         )
         requests.add(newRequest)
         return newRequest
-    }
-}
+    }}
