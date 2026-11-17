@@ -5,6 +5,7 @@ import org.example.model.MaintenanceRequest
 import org.example.model.UpdateRequestStatusDto
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.DeleteMapping
 
 @RestController
 @RequestMapping("/api/requests")
@@ -68,4 +69,17 @@ class RequestController {
         )
         requests.add(newRequest)
         return newRequest
-    }}
+    }
+    @DeleteMapping("/{id}")
+    fun deleteRequest(@PathVariable id: Long): ResponseEntity<Void> {
+        val index = requests.indexOfFirst { it.id == id }
+
+        if (index == -1) {
+            return ResponseEntity.notFound().build()
+        }
+
+        requests.removeAt(index)
+
+        return ResponseEntity.noContent().build()
+    }
+}

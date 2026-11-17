@@ -19,3 +19,12 @@ Content-Type: application/json
 
 ### Проверить обновлённую заявку
 GET http://localhost:8081/api/requests/1
+
+### Удалить заявку №2
+DELETE http://localhost:8081/api/requests/2
+
+### Проверить, что заявка удалена
+GET http://localhost:8081/api/requests/2
+
+### Удалить несуществующую заявку
+DELETE http://localhost:8081/api/requests/999
