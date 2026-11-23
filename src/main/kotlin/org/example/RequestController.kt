@@ -3,43 +3,27 @@ package org.example
 import org.example.model.CreateRequestDto
 import org.example.model.MaintenanceRequest
 import org.example.model.UpdateRequestStatusDto
+import org.example.repository.MaintenanceRequestRepository
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.bind.annotation.DeleteMapping
 
 @RestController
 @RequestMapping("/api/requests")
-class RequestController {
+class RequestController(private val requestRepository: MaintenanceRequestRepository) {
 
-    private val requests = mutableListOf(
-        MaintenanceRequest(
-            id = 1,
-            equipmentName = "Кондиционер №1",
-            description = "Не охлаждает помещение",
-            status = "Новая"
-        ),
-        MaintenanceRequest(
-            id = 2,
-            equipmentName = "Сервер №2",
-            description = "Повышенная температура",
-            status = "В работе"
-        )
-    )
-    private var nextId = 3L
+
+
 
     @GetMapping
     fun getAllRequests(): List<MaintenanceRequest> {
-        return requests
+        return requestRepository.findAll()
     }
     @GetMapping("/{id}")
     fun getRequestById(@PathVariable id: Long): ResponseEntity<MaintenanceRequest> {
-        val request = requests.find { it.id == id }
-
-        return if (request != null) {
-            ResponseEntity.ok(request)
-        } else {
-            ResponseEntity.notFound().build()
-        }
+        val request = requestRepository.findByIdOrNull(id)
+            ?: return ResponseEntity.notFound().build()
+        return ResponseEntity.ok(request)
     }
     @PatchMapping("/{id}/status")
     fun updateRequestStatus(
@@ -47,38 +31,29 @@ class RequestController {
         @RequestBody request: UpdateRequestStatusDto
     ): ResponseEntity<MaintenanceRequest> {
 
-        val index = requests.indexOfFirst { it.id == id }
-
-        if (index == -1) {
-            return ResponseEntity.notFound().build()
-        }
-
-        val updatedRequest = requests[index].copy(status = request.status)
-        requests[index] = updatedRequest
-
-        return ResponseEntity.ok(updatedRequest)
+        val existingRequest = requestRepository.findByIdOrNull(id)
+            ?: return ResponseEntity.notFound().build()
+        val updatedRequest = existingRequest.copy(status = request.status)
+        return ResponseEntity.ok(requestRepository.save(updatedRequest))
     }
 
     @PostMapping
     fun createRequest(@RequestBody request: CreateRequestDto): MaintenanceRequest {
         val newRequest = MaintenanceRequest(
-            id = nextId++,
             equipmentName = request.equipmentName,
             description = request.description,
             status = "Новая"
         )
-        requests.add(newRequest)
-        return newRequest
+        return requestRepository.save(newRequest)
     }
     @DeleteMapping("/{id}")
     fun deleteRequest(@PathVariable id: Long): ResponseEntity<Void> {
-        val index = requests.indexOfFirst { it.id == id }
 
-        if (index == -1) {
+        if (!requestRepository.existsById(id)) {
             return ResponseEntity.notFound().build()
         }
 
-        requests.removeAt(index)
+        requestRepository.deleteById(id)
 
         return ResponseEntity.noContent().build()
     }
