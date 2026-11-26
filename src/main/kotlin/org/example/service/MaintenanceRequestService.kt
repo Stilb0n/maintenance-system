@@ -1,5 +1,6 @@
 package org.example.service
 
+import org.example.exception.RequestNotFoundException
 import org.example.model.CreateRequestDto
 import org.example.model.MaintenanceRequest
 import org.example.model.UpdateRequestStatusDto
@@ -8,13 +9,19 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
 @Service
-class MaintenanceRequestService(private val requestRepository: MaintenanceRequestRepository) {
+class MaintenanceRequestService(
+    private val requestRepository: MaintenanceRequestRepository
+) {
+
     fun getAllRequests(): List<MaintenanceRequest> {
         return requestRepository.findAll()
     }
-    fun getRequestById(id: Long): MaintenanceRequest? {
+
+    fun getRequestById(id: Long): MaintenanceRequest {
         return requestRepository.findByIdOrNull(id)
+            ?: throw RequestNotFoundException("Заявка с ID $id не найдена")
     }
+
     fun createRequest(request: CreateRequestDto): MaintenanceRequest {
         val newRequest = MaintenanceRequest(
             equipmentName = request.equipmentName,
@@ -28,21 +35,19 @@ class MaintenanceRequestService(private val requestRepository: MaintenanceReques
     fun updateRequestStatus(
         id: Long,
         request: UpdateRequestStatusDto
-    ): MaintenanceRequest? {
-        val existingRequest = getRequestById(id) ?: return null
+    ): MaintenanceRequest {
+        val existingRequest = getRequestById(id)
 
         val updatedRequest = existingRequest.copy(status = request.status)
 
         return requestRepository.save(updatedRequest)
     }
 
-    fun deleteRequest(id: Long): Boolean {
+    fun deleteRequest(id: Long) {
         if (!requestRepository.existsById(id)) {
-            return false
+            throw RequestNotFoundException("Заявка с ID $id не найдена")
         }
 
         requestRepository.deleteById(id)
-        return true
     }
-
 }

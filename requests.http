@@ -10,6 +10,14 @@ Content-Type: application/json
   "description": "Не включается",
   "status":"NEW"
 }
+### Создать новую заявку
+POST http://localhost:8081/api/requests
+Content-Type: application/json
+
+{
+  "equipmentName": "   ",
+  "description": ""
+}
 ### Изменить статус заявки №1
 PATCH http://localhost:8081/api/requests/1/status
 Content-Type: application/json
