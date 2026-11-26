@@ -16,10 +16,12 @@ repositories {
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
-
+    implementation("org.springframework.boot:spring-boot-starter-validation")
     // Работа с базой данных через JPA
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-
+    // Миграции базы данных
+    implementation("org.flywaydb:flyway-core")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql")
     // Драйвер PostgreSQL
     runtimeOnly("org.postgresql:postgresql")
 

@@ -7,7 +7,8 @@ Content-Type: application/json
 
 {
   "equipmentName": "Кондиционер №3",
-  "description": "Не включается"
+  "description": "Не включается",
+  "status":"NEW"
 }
 ### Изменить статус заявки №1
 PATCH http://localhost:8081/api/requests/1/status
